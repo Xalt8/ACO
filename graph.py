@@ -17,6 +17,8 @@ with open('shortest_path.txt', 'r') as f:
 
 
 def create_complete_graph(coords:list[tuple]) -> nx.Graph:
+    ''' Creates an networkx complete graph and assigns the coordinates
+        as x & y attributes to every node in graph'''
     comp_graph = nx.complete_graph(np.arange(1, len(coords) +1))
     attrs = {node: {'x':_x, 'y':_y} for node, (_x, _y) in zip(list(comp_graph.nodes), coords)}
     nx.set_node_attributes(comp_graph, attrs)
@@ -25,7 +27,7 @@ def create_complete_graph(coords:list[tuple]) -> nx.Graph:
 
 def get_distance(node1:tuple, node2:tuple) -> float:
     '''Returns the distance between 2 nodes/coordinates'''
-    return np.linalg.norm(np.array(node1) - np.array(node2))
+    return round(np.linalg.norm(np.array(node1) - np.array(node2)), 2)
 
 
 def set_distance(graph:nx.Graph) -> None:
@@ -38,18 +40,8 @@ def set_distance(graph:nx.Graph) -> None:
 def set_initial_phermone(graph:nx.Graph) -> None:
     ''' Sets the phermone to 1 for all edges '''
     for node1, node2 in list(graph.edges):
-        graph[node1][node2]['phermone'] = 1
+        graph[node1][node2]['phermone'] = 0.00005
 
-def calculate_trip_distance(path:list[tuple], graph:nx.Graph) -> float:
-    ''' Takes a list of node edges and returns the total 
-        Euclidean distance of the trip '''
-    total_distance = []
-    for node1, node2 in path:
-        total_distance.append(
-            get_distance(
-                (graph.nodes[node1]['x'], graph.nodes[node1]['y']), 
-                (graph.nodes[node2]['x'], graph.nodes[node2]['y'])))
-    return np.around(np.sum(total_distance), decimals=2)
 
 
 def plot_graph(graph:nx.Graph) -> plt.Axes:
@@ -69,10 +61,12 @@ def plot_graph(graph:nx.Graph) -> plt.Axes:
 
     plt.show()
 
+def get_graph(coords:list[tuple])-> nx.Graph:
+    graph = create_complete_graph(coords)
+    set_distance(graph) 
+    set_initial_phermone(graph)
+    return graph
 
-graph = create_complete_graph(coords)
-set_distance(graph) 
-set_initial_phermone(graph)
 
 
 if __name__ == '__main__':
@@ -82,3 +76,5 @@ if __name__ == '__main__':
     # set_distance(graph) 
     # set_initial_phermone(graph)
     # plot_graph(graph)
+
+    

@@ -2,7 +2,7 @@ import numpy as np
 from dataclasses import dataclass, field
 import networkx as nx
 import random
-from graph import graph
+from graph import get_graph, coords, get_distance, short_path
 
 
 @dataclass
@@ -12,10 +12,10 @@ class Ant:
     tour: list[tuple] = field(default_factory=list, init=False)
     current_node:int = field(init=False)  
     graph: nx.Graph
-    alpha = 1 # Importance of phermone
-    beta = 1 # Importance of heuristics
-    q0 = 0.5
-    rho = 0.99 # used to decay the phermone trail
+    beta = 2    # Importance of heuristics
+    q0 = 0.9    # Higher number leads to more exploitation 
+    rho = 0.1   # used to decay the phermone trail
+    tau = 0.0005 # initial pheromone
 
     
     def __post_init__(self):
@@ -33,7 +33,7 @@ class Ant:
     
     def score_node(self, node:int) -> float:
         ''' Scores the node based on phermone and distance'''
-        return self.graph[self.current_node][node]['phermone']**self.alpha * \
+        return self.graph[self.current_node][node]['phermone'] * \
                     (1/self.graph[self.current_node][node]['distance'])**self.beta
 
     
@@ -61,6 +61,13 @@ class Ant:
             node = int(np.random.choice(a=unvisited_nodes, size=1, p=prob_dist))
             
         return node
+
+    def local_phermone_update(self, node:int) -> None:
+        ''' Updates the graph with the local pheromone update rule
+            for each node visited'''
+        self.graph[self.current_node][node]['phermone'] = \
+            (1 - self.rho) * self.graph[self.current_node][node]['phermone'] + self.rho * self.tau
+
   
     def visit_node(self, node:int) -> None:
         ''' Adds the node to the visited_nodes list'''
@@ -82,14 +89,78 @@ class Ant:
         # While there are nodes to visit choose and visit them
         while self.get_unvisited_nodes():
             chosen_node = self.choose_node(self.get_unvisited_nodes())
+            self.local_phermone_update(chosen_node)
             self.visit_node(chosen_node)
         
         self.complete_tour()
         return self.tour
 
 
+@dataclass
+class AntColony:
+
+    best_path: field(default_factory=list, init=False) 
+    graph: nx.Graph
+    ants: field(default_factory=list, init=False)
+    num_ants:int = 10
+    best_path_distance:float = np.inf
+    alpha = 0.1
+
+    def spawn_ants(self) -> list[Ant]:
+        ''' Creates a list of Ant objects'''
+        self.ants = [Ant(self.graph) for _ in range(self.num_ants)]
+
+    def calculate_trip_distance(self, path:list[tuple]) -> float:
+        ''' Takes a list of edges(tuples) and returns the total 
+            Euclidean distance of all edges '''
+        total_distance = []
+        for node1, node2 in path:
+            total_distance.append(
+                get_distance(
+                    (self.graph.nodes[node1]['x'], self.graph.nodes[node1]['y']), 
+                    (self.graph.nodes[node2]['x'], self.graph.nodes[node2]['y'])))
+        return np.around(np.sum(total_distance), decimals=2)
+
+    def set_global_best(self) -> None:
+        ''' For all ants -> makes a tour, calculate the distance of tour 
+            and if the distance is better than the gbest tour it updates the gbest tour'''
+        for ant in self.ants:
+            tour = ant.run()
+            tour_distance = self.calculate_trip_distance(tour)
+            if tour_distance < self.best_path_distance:
+                self.best_path_distance = tour_distance
+                self.best_path = tour
+
+    def global_update_pheromone(self) -> None:
+        ''' Takes the best tour and adds pheromone to the edges. '''
+        for node1, node2 in self.best_path:
+            self.graph[node1][node2]['phermone'] = \
+                (1 - self.alpha) * self.graph[node1][node2]['phermone'] + \
+                    self.alpha * (self.best_path_distance ** -1)
+
+    
+    def optimize(self):
+        
+        iterations = 200
+                
+        for i in range(iterations):
+
+            if self.calculate_trip_distance(short_path) == self.best_path_distance:
+                print("Found shortest path in {i} iterations")
+                break
+            
+            self.spawn_ants()
+            self.set_global_best()
+            self.global_update_pheromone()
+            
+        return self.best_path
 
 if __name__ == '__main__':
+        
+    graph = get_graph(coords=coords)
+    colony = AntColony(graph)
+    colony.optimize()
+
+
+
     
-    ant = Ant(graph)
-    print(ant.run())

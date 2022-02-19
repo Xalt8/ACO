@@ -15,6 +15,9 @@ with open('coordinates.txt', 'r') as f:
 with open('shortest_path.txt', 'r') as f:
     short_path = [int(j) for j in [i.split(" ") for i in f][0] if j!=""]
 
+# Makes a list of tuples and connects the first and last nodes
+short_path = list(zip(short_path, short_path[1:] + short_path[:1]))
+
 
 def create_complete_graph(coords:list[tuple]) -> nx.Graph:
     ''' Creates an networkx complete graph and assigns the coordinates
@@ -26,7 +29,7 @@ def create_complete_graph(coords:list[tuple]) -> nx.Graph:
     
 
 def get_distance(node1:tuple, node2:tuple) -> float:
-    '''Returns the distance between 2 nodes/coordinates'''
+    '''Returns the Euclidean distance between 2 nodes'''
     return round(np.linalg.norm(np.array(node1) - np.array(node2)), 2)
 
 
@@ -61,6 +64,7 @@ def plot_graph(graph:nx.Graph) -> plt.Axes:
 
     plt.show()
 
+
 def get_graph(coords:list[tuple])-> nx.Graph:
     graph = create_complete_graph(coords)
     set_distance(graph) 
@@ -68,9 +72,8 @@ def get_graph(coords:list[tuple])-> nx.Graph:
     return graph
 
 
-
 if __name__ == '__main__':
-    pass
+    print(short_path)
     
     # graph = create_complete_graph(coords)
     # set_distance(graph) 

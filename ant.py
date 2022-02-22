@@ -62,6 +62,7 @@ class Ant:
             
         return node
 
+
     def local_phermone_update(self, node:int) -> None:
         ''' Updates the graph with the local pheromone update rule
             for each node visited'''

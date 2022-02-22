@@ -48,7 +48,7 @@ if __name__ == '__main__':
     # Simulated Annealing Algorithm
     cost0 = Coordinate.get_total_distance(coords)
     
-    T = 300
+    T = 30
     factor = 0.99
     T_init = T
 

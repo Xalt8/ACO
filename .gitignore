@@ -1,3 +1,7 @@
 env 
 .ipynb_checkpoints/Untitled-2-checkpoint.ipynb
 __pycache__/graph.cpython-39.pyc
+__pycache__/city.cpython-39.pyc
+.gitignore
+__pycache__/sa1.cpython-39.pyc
+.gitignore

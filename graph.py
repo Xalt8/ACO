@@ -40,8 +40,9 @@ def set_distance(graph:nx.Graph) -> None:
             node1=(graph.nodes[node1]['x'], graph.nodes[node1]['y']),
             node2= (graph.nodes[node2]['x'], graph.nodes[node2]['y']))
 
+
 def set_initial_phermone(graph:nx.Graph) -> None:
-    ''' Sets the phermone to 1 for all edges '''
+    ''' Sets the phermone for all edges '''
     for node1, node2 in list(graph.edges):
         graph[node1][node2]['phermone'] = 0.00005
 

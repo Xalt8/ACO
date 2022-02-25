@@ -80,7 +80,8 @@ class Ant:
     def complete_tour(self) -> None:
         ''' Takes the last node visited makes an edge to the first node'''
         self.tour.append((self.tour[-1][1], self.tour[0][0])) 
-    
+
+
     def run(self) -> list[tuple]:
         ''' Main loop
             While there are unvisited nodes choose a node
@@ -100,14 +101,15 @@ class AntColony:
     graph: nx.Graph
     num_ants:int = 10
     best_path_distance:float = np.inf
-    alpha = 0.1
     best_path:list[tuple] = field(default_factory=list,  init=False) 
     ants:list[Ant] = field(default_factory=list,  init=False)
+    alpha = 0.1
     
 
     def spawn_ants(self) -> list[Ant]:
         ''' Creates a list of Ant objects'''
         self.ants = [Ant(self.graph) for _ in range(self.num_ants)]
+
 
     def calculate_trip_distance(self, path:list[tuple]) -> float:
         ''' Takes a list of edges(tuples) and returns the total 
@@ -120,6 +122,7 @@ class AntColony:
                     (self.graph.nodes[node2]['x'], self.graph.nodes[node2]['y'])))
         return np.around(np.sum(total_distance), decimals=2)
 
+
     def set_global_best(self) -> None:
         ''' For all ants -> makes a tour, calculate the distance of tour 
             and if the distance is better than the gbest tour it updates the gbest tour'''
@@ -130,13 +133,15 @@ class AntColony:
                 self.best_path_distance = tour_distance
                 self.best_path = tour
 
+
     def global_update_pheromone(self) -> None:
         ''' Takes the best tour and adds pheromone to the edges. '''
         for node1, node2 in self.best_path:
             self.graph[node1][node2]['phermone'] = \
                 (1 - self.alpha) * self.graph[node1][node2]['phermone'] + \
                     self.alpha * (self.best_path_distance ** -1)
-    
+
+
     def optimize(self):
         
         iterations = 500
@@ -154,6 +159,7 @@ class AntColony:
             print(f'{i} best distance:{self.best_path_distance}')
             
         return self.best_path
+
 
 if __name__ == '__main__':
         

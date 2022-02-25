@@ -40,11 +40,9 @@ for city_num in short_path:
             short_path_cities.append(City(name=str(city_num), x=city.x, y=city.y))
 
 
-
-
 def calculate_distance(city1:City, city2:City)-> float:
     ''' Takes 2 cities and returns the distance between them'''
-    return np.sqrt(np.abs(city1.x - city2.x)**2 + np.abs(city1.y - city2.y)**2)
+    return round(np.sqrt(np.abs(city1.x - city2.x)**2 + np.abs(city1.y - city2.y)**2),2)
 
 
 def generate_tour(city_list:list[City])-> list[City]:

@@ -13,10 +13,12 @@ with open('coordinates.txt', 'r') as f:
 CITIES = [City(str(i), int(l[0]), int(l[1])) for i, l in enumerate(lines, 1)]
 
 
+# Read in the shortest path from file
 with open('shortest_path.txt', 'r', encoding='utf8') as f:
         lines = f.readlines()
 
 short_path = [int(i) for i in lines[0].split()]
+
 
 # Create a list of cities with the shortest path
 SHORTEST_PATH = []

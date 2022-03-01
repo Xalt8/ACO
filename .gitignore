@@ -5,3 +5,7 @@ __pycache__/city.cpython-39.pyc
 .gitignore
 __pycache__/sa1.cpython-39.pyc
 .gitignore
+__pycache__/funcs.cpython-39.pyc
+__pycache__/opt.cpython-39.pyc
+__pycache__/pso.cpython-39.pyc
+.gitignore

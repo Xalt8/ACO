@@ -1,8 +1,9 @@
 import numpy as np
 from pso import PSO
 from dataclasses import dataclass
-from city import CITIES, City
+from city import CITIES, City, SHORTEST_PATH
 from opt import twoOpt
+from funcs import plot
 
 
 
@@ -60,7 +61,7 @@ class CPSO(PSO):
 
     def optimise(self):
         
-        iterations = 200
+        iterations = 500
         
         self.initialise()
         self.pick_informants_ring_topology()
@@ -75,16 +76,14 @@ class CPSO(PSO):
             self.set_gbest()  
             self.set_constricted_velocity()
             self.move_random_back()
-            self.local_search()
+            # self.local_search()
 
 
 if __name__ == '__main__':
     
     cpso = CPSO(city_list=CITIES, min_max='min')
     cpso.optimise()
-    # tour = [CITIES[int(city)].name for city in cpso.gbest_pos] 
-    # print(tour)
+    tour = [CITIES[int(city)] for city in cpso.gbest_pos]
 
-    d = ['15', '16', '17', '18']
+    plot(city_list=CITIES, final_tour=tour, shortest_path=SHORTEST_PATH)
 
-    print([[city.name for city in CITIES].index(val) for val in d])

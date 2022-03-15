@@ -1,10 +1,8 @@
-from re import X
-from unicodedata import name
 import numpy as np
 from numba.experimental import jitclass
 from numba import int64, types, njit, typed, typeof, float64
 import random
-
+from funcs import plot
 
 # Source: https://www.youtube.com/watch?v=4OfJa3SfU84
 
@@ -53,6 +51,20 @@ for i, line in enumerate(lines, 1):
     CITIES.append(City(name=str(i), x=int(line[0]), y=int(line[1])))
 
 
+# Read in the shortest path from file
+with open('shortest_path.txt', 'r', encoding='utf8') as f:
+        lines = f.readlines()
+
+short_path = [int(i) for i in lines[0].split()]
+
+# Create a list of cities with the shortest path
+SHORTEST_PATH = []
+for city_num in short_path:
+    for city in CITIES:
+        if str(city_num) == city.name:
+            SHORTEST_PATH.append(City(name=str(city_num), x=city.x, y=city.y))
+
+
 bat_spec=[
     ('pop_size', int64),
     ('num_move', int64),
@@ -66,7 +78,7 @@ bat_spec=[
     ('frequency_range', float64[:]),
     ('alpha', float64),
     ('gamma', float64),
-    ('best_tour', float64[:]), # Change this to list[City]
+    ('best_tour', int64[:]), # Change this to list[City]
     ('gamma', float64),
     ('best_tour', int64[:]),
     ('best_fitness', float64),
@@ -153,7 +165,6 @@ class BatAlgorithm:
         new_position = position + (r1 * np.mean(self.loudness))
         return self.feasible_position(new_position)
 
-
     
     def optimise_continuous(self) -> None:
         
@@ -182,10 +193,12 @@ class BatAlgorithm:
                 if (random.random() < self.loudness[index]) & (new_pos_fitness < self.fitness[self.best_bat]):
                     self.population[index] = new_position
                     self.fitness[index] = new_pos_fitness
+                    # Set the loudness 
                     if self.loudness[index] > 0.05:
                         self.loudness[index] *= self.alpha
                     else:
                         self.loudness[index] = 0.05
+                    # Set the pulse rate
                     self.pulse_rate[index] = self.pulse_rate[index] * (1 - np.exp(-self.gamma * i))
                 # Rank the bats and get best bat
                 if self.fitness[index] < self.fitness[self.best_bat]:
@@ -195,7 +208,9 @@ class BatAlgorithm:
                     
 
 if __name__=='__main__':
-   
     
     batman = BatAlgorithm(city_list=CITIES)
     batman.optimise_continuous()
+    optimised_tour = [CITIES[city_index] for city_index in batman.best_tour] 
+
+    plot(city_list=CITIES, final_tour=optimised_tour, shortest_path=SHORTEST_PATH)

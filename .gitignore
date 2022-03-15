@@ -9,3 +9,4 @@ __pycache__/funcs.cpython-39.pyc
 __pycache__/opt.cpython-39.pyc
 __pycache__/pso.cpython-39.pyc
 .gitignore
+__pycache__/bat.cpython-39.pyc

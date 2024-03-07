@@ -139,7 +139,7 @@ class ACO:
             self.best_path_list.append(self.best_path)
             self.pheromone_graph_list.append(self.pheromone_graph)
         print(f"Shortest path distance -> {self.get_tour_length(self.shortest_path)}")
-        self.animate_graph()
+        self.animate_graph2()
         
 
 
@@ -172,7 +172,7 @@ class ACO:
                     pheromone_lines.append(line)
             return pheromone_lines
 
-        animation = FuncAnimation(fig=fig, func=update_data, frames=self.iterations, interval=100, repeat=False, blit=True)
+        animation = FuncAnimation(fig=fig, func=update_data, frames=self.iterations, interval=100, repeat=False)
         metadata = {'title':'pheromone_graph', 'artist':'Karan Singh'}
         plt.tight_layout()
         # animation.save(filename="pheromone_graph2.gif", fps=30, dpi=100, metadata=metadata)
@@ -199,10 +199,7 @@ class ACO:
 
         def update_data(frame) -> list:
             # Remove previous line plots
-            for line in pheromone_lines:
-                line.remove()
-            pheromone_lines.clear()
-
+            
             for line in best_path_line:
                 line.remove()
             best_path_line.clear()
@@ -219,14 +216,15 @@ class ACO:
                 best_path_line.append(line)
 
             # Pheromone lines for the pheromone graph
+            pheromone_lines.clear()
             pheromone_graph = self.pheromone_graph_list[frame]
             for start_city, neighbours in pheromone_graph.items():
                 for end_city, pheromone_value in neighbours.items():
                     start_city_coords = self.city_coordinates[start_city]
                     end_city_coords = self.city_coordinates[end_city] 
                     line1, = plt.plot([start_city_coords[0], end_city_coords[0]],
-                                     [start_city_coords[1], end_city_coords[1]],
-                                      color='royalblue', linewidth=pheromone_value, zorder=1)
+                                     [start_city_coords[1], end_city_coords[1]], 
+                                     linewidth=pheromone_value, color='plum', zorder=1)
                     pheromone_lines.append(line1)
             
             return [best_path_line] + pheromone_lines
@@ -234,9 +232,9 @@ class ACO:
         animation = FuncAnimation(fig=fig, func=update_data, frames=self.iterations, interval=100, repeat=False)
         metadata = {'title':'pheromone_graph', 'artist':'Karan Singh'}
         plt.tight_layout()
-        # animation.save(filename="pheromone_graph2.gif", fps=30, dpi=100, metadata=metadata)
-        # print("animation saved")
-        plt.show()
+        animation.save(filename="pheromone_graph2.gif", fps=30, dpi=100, metadata=metadata)
+        print("animation saved")
+        # plt.show()
         
 
 

@@ -81,7 +81,11 @@ def twoOpt(pop:np.ndarray, velocity:int, city_list:list[City]) -> np.ndarray:
     best_tour_length = get_tour_length(best_tour)
 
     # Randomly select velocity number of indices of the pop less 3 because i+2  
-    selected_indices = np.random.choice(len(pop)-3, velocity, replace=False)
+    if len(pop)-3 > velocity:
+        selected_indices = np.random.choice(len(pop)-3, velocity, replace=False)
+    else:
+        selected_indices = np.random.choice(len(pop)-3, len(pop)-3, replace=False)
+
     for i in selected_indices:
         k = i+2
         position = np.hstack((pop[:i], pop[i:k+1][::-1], pop[k+1:]))
@@ -96,7 +100,7 @@ def twoOpt(pop:np.ndarray, velocity:int, city_list:list[City]) -> np.ndarray:
 
 
 
-@njit
+# @njit
 def discrete_batman(city_list:list[City], num_bats:int):
     
     # Inititialise variables
@@ -112,28 +116,48 @@ def discrete_batman(city_list:list[City], num_bats:int):
 
 
     # Main loop
-    for i in range(10):
+    for i in range(100):
         print(i, best_tour_length)
-
-        for bat_id, _ in enumerate(population):
-            population[bat_id] = twoOpt(population[bat_id], velocity[bat_id], city_list)
         
-        fitness = calculate_fitness(city_list, population)
-        best_bat = np.argmin(fitness)
-        best_tour_position = population[best_bat]
-        best_tour = get_tour_from_position(best_tour_position, city_list)
-        best_tour_length = get_tour_length(best_tour)
-        velocity = calculate_velocity(population=population, best_bat_index=best_bat)                        
+        for bat_id, _ in enumerate(population):
+            # Generate new solutions
+            new_position = twoOpt(population[bat_id], velocity[bat_id], city_list)
+            new_tour = get_tour_from_position(position=new_position, city_list=city_list)
+            new_position_fitness = get_tour_length(new_tour)
+            
+            # if rand > pulse rate select one solution and generate new solution using 2-opt
+            if random.random() > pulse_rate[bat_id]:
+                new_position = twoOpt(new_position, 5, city_list)
+                new_tour = get_tour_from_position(position=new_position, city_list=city_list)
+                new_position_fitness = get_tour_length(new_tour)
+            
+            if (random.random() < loudness[bat_id]) & (new_position_fitness < fitness[best_bat]):
+                # Accept new position
+                population[bat_id] = new_position
+                # Reduce loudness
+                if loudness[bat_id] > 0.05:
+                    loudness[bat_id] *= 0.9 
+                else:
+                    loudness[bat_id] = 0.05
+                # Increase pulse rate    
+                pulse_rate[bat_id] = pulse_rate[bat_id] * (1 - np.exp(-0.9 * i))
+            # Rank the bats and get best bat
+            if fitness[bat_id] < fitness[best_bat]:
+                best_bat = bat_id
+                best_tour_position = population[bat_id]
+                best_tour = get_tour_from_position(best_tour_position, city_list) 
+                best_tour_length = get_tour_length(best_tour)    
 
+        fitness = calculate_fitness(city_list, population)
+        velocity = calculate_velocity(population=population, best_bat_index=best_bat)
 
 
 if __name__ == '__main__':
     
     discrete_batman(city_list=CITIES, num_bats=10) 
+    
     # population = initialise_population(CITIES, 10)
-
     # new_pos = twoOpt(population[0], 3, CITIES)
-
     # print(population[0])
     # ham = calculate_hamming_distance(population[0], new_pos)
     # print(f'Hamming distance = {ham}')

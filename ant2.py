@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 import numpy as np
 from city import City, CITIES, SHORTEST_PATH, get_city
 import random
-from sa1 import calculate_distance, get_tour_length, plot
+from funcs import calculate_distance, get_tour_length, plot
 
 # ====================
 # TYPES
@@ -110,7 +110,7 @@ class AntColony:
     best_path:list[City] = None
     best_path_distance:float = np.inf
     alpha = 0.1
-    iterations:int = 500
+    iterations:int = 100
     tau = 0.0005 # initial pheromone
 
     def __post_init__(self):
@@ -181,7 +181,10 @@ if __name__ == '__main__':
     aco.optimise()
 
     optimised_tour = [get_city(city, CITIES) for city in aco.best_path]
+    # print("optimized_tour_length -> {}".format(optimised_tour(optimised_tour)))
 
     plot(city_list=CITIES, final_tour=optimised_tour, shortest_path=SHORTEST_PATH)    
+
+    
 
     

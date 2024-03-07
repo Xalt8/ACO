@@ -1,4 +1,5 @@
 env 
+venv
 .ipynb_checkpoints/Untitled-2-checkpoint.ipynb
 __pycache__/graph.cpython-39.pyc
 __pycache__/city.cpython-39.pyc
@@ -10,3 +11,11 @@ __pycache__/opt.cpython-39.pyc
 __pycache__/pso.cpython-39.pyc
 .gitignore
 __pycache__/bat.cpython-39.pyc
+*.pyc
+
+*.docx
+Images/combinations.png
+Images/_b0b75997-d502-4690-8c19-e30990ef9e40.jpg
+Images/_f9d9348c-efea-4ae5-ac6b-f10ccda2d3c6.jpg
+pheromone_graph.gif
+pheromone_graph2.gif
